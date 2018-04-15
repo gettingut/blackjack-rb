@@ -9,8 +9,6 @@ require_relative 'user'
 require_relative 'dealer'
 require_relative 'table_manager'
 
-require 'byebug'
-
 class Main
   include Interface
 
