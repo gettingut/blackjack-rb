@@ -1,9 +1,7 @@
 # frozen_string_literal: true
 
 class TableManager
-  include Deck
-
-  attr_reader :players, :main
+  attr_reader :players, :deck, :main
 
   def initialize(main)
     @main = main
@@ -16,7 +14,7 @@ class TableManager
   end
 
   def give_cards(player, amount)
-    cards = pick_cards(amount)
+    cards = deck.pick_cards(amount)
     player.cards += cards
   end
 
@@ -68,5 +66,9 @@ class TableManager
 
   def detect_opponent(player)
     players.detect { |player_| player_ != player }
+  end
+
+  def new_deck
+    Deck.new
   end
 end

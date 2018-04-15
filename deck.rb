@@ -1,16 +1,20 @@
 # frozen_string_literal: true
 
-require_relative 'deck/card'
-require_relative 'deck/suit'
-require_relative 'deck/diamonds'
-require_relative 'deck/hearts'
-require_relative 'deck/clubs'
-require_relative 'deck/spades'
+class Deck
+  SUITS = {
+    'Clubs' => "\u2667",
+    'Diamonds' => "\u2662",
+    'Hearts' => "\u2661",
+    'Spades' => "\u2664"
+  }.freeze
+  FACE_CARDS_NAMES = %w[J Q K A].freeze
+  FACE_CARDS_VALUE = 10
+  ACE_VALUE = 11
 
-module Deck
   attr_reader :cards
 
-  def new_deck
+  def initialize
+    @cards = []
     build_deck
     shuffle
   end
@@ -26,22 +30,29 @@ module Deck
   private
 
   def build_deck
-    @cards = hearts.cards + diamonds.cards + clubs.cards + spades.cards
+    SUITS.each do |suit, image|
+      cards = build_common_cards(suit, image) + build_face_cards(suit, image)
+      @cards += cards
+    end
   end
 
-  def hearts
-    @hearts ||= Hearts.new
+  def build_common_cards(suit, image)
+    (2..10).map do |value|
+      new_card(name: value.to_s, suit: suit, value: value, image: image)
+    end
   end
 
-  def diamonds
-    @diamonds ||= Diamonds.new
+  def build_face_cards(suit, image)
+    FACE_CARDS_NAMES.map do |name|
+      if name == 'A'
+        new_card(name: name, suit: suit, value: ACE_VALUE, image: image)
+      else
+        new_card(name: name, suit: suit, value: FACE_CARDS_VALUE, image: image)
+      end
+    end
   end
 
-  def clubs
-    @clubs ||= Clubs.new
-  end
-
-  def spades
-    @spades ||= Spades.new
+  def new_card(name:, suit:, value:, image:)
+    Card.new(name: name, suit: suit, value: value, image: image)
   end
 end

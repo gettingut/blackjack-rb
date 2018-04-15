@@ -42,7 +42,9 @@ module Interface
     end
 
     def print_cards(player)
-      player.cards.each { |card| print "#{card.name}#{card.suit.image} " }
+      player.cards.each do |card|
+        print "#{card.name}#{card.image} "
+      end
     end
 
     def line_lg_wrap(message)

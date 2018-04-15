@@ -40,7 +40,7 @@ module Interface
     def handle_win(player)
       print_win_message(player)
       player.money += bank
-      bank = 0
+      main.bank = 0
     end
 
     def handle_draw
@@ -48,7 +48,7 @@ module Interface
       print_draw_message
       user.money += prize
       dealer.money += prize
-      bank = 0
+      main.bank = 0
     end
 
     def print_dealer_ui

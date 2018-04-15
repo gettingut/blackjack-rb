@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require_relative 'card'
 require_relative 'deck'
 require_relative 'user_actions'
 require_relative 'interface'
@@ -7,6 +8,8 @@ require_relative 'player'
 require_relative 'user'
 require_relative 'dealer'
 require_relative 'table_manager'
+
+require 'byebug'
 
 class Main
   include Interface
