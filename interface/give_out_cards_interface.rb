@@ -22,11 +22,6 @@ module Interface
       main.players.each { |player| table_manager.take_bet(player, 10) }
     end
 
-    def interface_title
-      puts "\n"
-      "\tActions:"
-    end
-
     def print_dealer_ui
       print "\tDealer cards: "
       print_hidden_cards(dealer)

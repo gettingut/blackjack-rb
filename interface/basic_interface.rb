@@ -2,45 +2,22 @@
 
 module Interface
   class BasicInterface
+    include UserActions
+
     def initialize(main)
       @main = main
     end
 
     def perform
-      print_commands
-      @input = input_command
+      print_actions
+      @input = input_action
       return unless input
-      command_to_action(input)
+      actions_to_method(input)
     end
 
     protected
 
-    attr_reader :main, :input
-
-    UNKNOWN_COMMAND = "Unknown command.\n\n"
-
-    def print_commands
-      puts interface_title
-      commands.each { |num, command| puts "\t#{num}: #{command[:text]}" }
-    end
-
-    def input_command
-      command = gets.chomp.to_i
-      if valid_command?(command)
-        command
-      else
-        puts UNKNOWN_COMMAND
-        input_command
-      end
-    end
-
-    def command_to_action(command)
-      send(commands[command][:action])
-    end
-
-    def valid_command?(command)
-      commands.keys.include?(command)
-    end
+    attr_reader :main
 
     def players
       main.players

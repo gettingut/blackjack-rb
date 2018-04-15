@@ -2,6 +2,8 @@
 
 module Interface
   class ShowCardsInterface < BasicTableInterface
+    include UserActions
+
     def perform
       calculate_winner
       super
@@ -9,15 +11,15 @@ module Interface
 
     private
 
-    def interface_title
+    def actions_title
       puts "\n"
       "\tActions:"
     end
 
-    def commands
+    def actions
       {
-        1 => { text: 'Play again', action: :play_again },
-        2 => { text: 'Exit', action: :exit }
+        1 => { text: 'Play again', method: :play_again },
+        2 => { text: 'Exit', method: :exit }
       }
     end
 
@@ -38,7 +40,7 @@ module Interface
     def handle_win(player)
       print_win_message(player)
       player.money += bank
-      main.bank = 0
+      bank = 0
     end
 
     def handle_draw
@@ -46,7 +48,7 @@ module Interface
       print_draw_message
       user.money += prize
       dealer.money += prize
-      main.bank = 0
+      bank = 0
     end
 
     def print_dealer_ui

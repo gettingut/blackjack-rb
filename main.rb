@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'deck'
+require_relative 'user_actions'
 require_relative 'interface'
 require_relative 'player'
 require_relative 'user'
@@ -15,7 +16,6 @@ class Main
   def initialize
     @players = []
     @bank = 0
-    main_menu_interface.perform
   end
 
   def user
@@ -24,6 +24,10 @@ class Main
 
   def dealer
     @dealer ||= detect(Dealer)
+  end
+
+  def start_game!
+    main_menu_interface.perform
   end
 
   private
@@ -37,4 +41,5 @@ class Main
   end
 end
 
-Main.new
+main = Main.new
+main.start_game!

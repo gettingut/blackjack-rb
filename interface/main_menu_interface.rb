@@ -2,6 +2,8 @@
 
 module Interface
   class MainMenuInterface < BasicInterface
+    include UserActions
+
     def perform
       print_logo
       super
@@ -9,14 +11,14 @@ module Interface
 
     private
 
-    def commands
+    def actions
       {
-        1 => { text: 'Play', action: :play },
-        2 => { text: 'Exit', action: :exit }
+        1 => { text: 'Play', method: :play },
+        2 => { text: 'Exit', method: :exit }
       }
     end
 
-    def interface_title
+    def actions_title
       "\n\t\tMain menu\n"
     end
 

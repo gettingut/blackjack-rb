@@ -6,7 +6,7 @@ module Interface
       puts interface_title
       create_player
       create_dealer
-      start_game!
+      give_out_cards
     rescue ArgumentError => e
       puts e.message + "\n\n"
       retry
@@ -14,7 +14,7 @@ module Interface
 
     private
 
-    def start_game!
+    def give_out_cards
       give_out_cards_interface.perform
     end
 

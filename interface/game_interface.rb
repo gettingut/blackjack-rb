@@ -4,15 +4,15 @@ module Interface
   class GameInterface < BasicTableInterface
     private
 
-    def commands
+    def actions
       {
-        1 => { text: 'Check', action: :user_checks },
-        2 => { text: 'Take card', action: :user_take_card },
-        3 => { text: 'Show your cards', action: :user_show_cards }
+        1 => { text: 'Check', method: :user_checks },
+        2 => { text: 'Take card', method: :user_take_card },
+        3 => { text: 'Show your cards', method: :user_show_cards }
       }
     end
 
-    def interface_title
+    def actions_title
       puts "\n"
       "\tActions:"
     end
