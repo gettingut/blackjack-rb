@@ -1,6 +1,13 @@
 # frozen_string_literal: true
 
 class MainMenuController
+  include InputValidator
+
+  MAIN_MENU_ACTIONS = {
+    1 => { text: 'Play', method: :new_game },
+    2 => { text: 'Exit', method: :exit }
+  }.freeze
+
   attr_reader :interface, :players
 
   def initialize(interface)
@@ -9,27 +16,24 @@ class MainMenuController
   end
 
   def main_menu!
-    actions = {
-      1 => { text: 'Play', method: :new_game },
-      2 => { text: 'Exit', method: :exit }
-    }
-    interface.show_main_menu(actions)
-    input = interface.receive_action
-    input_to_method(actions, input)
+    interface.show_main_menu(MAIN_MENU_ACTIONS)
+    play_or_exit_input = interface.receive_action
+    check_input(MAIN_MENU_ACTIONS, play_or_exit_input)
+    method = MAIN_MENU_ACTIONS[play_or_exit_input][:method]
+    send(method)
+  rescue RuntimeError => e
+    puts e.message
+    retry
   end
 
   private
 
   def new_game
-    interface.new_player
+    interface.enter_name_message
     name = interface.receive_name
     players << new_user(name)
     players << new_dealer
-    table_controller.start_new_game!
-  end
-
-  def input_to_method(actions, input)
-    send(actions[input][:method])
+    loop { table_controller.start_new_game! }
   end
 
   def exit

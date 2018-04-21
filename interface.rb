@@ -10,23 +10,37 @@ class Interface
     logo.each_line { |line| print "\t #{line}" }
   end
 
-  def flash(message)
-    puts LINE_LG
-    puts "\t" * 3 + message
-    puts LINE_LG
-  end
-
   def show_main_menu(actions)
     print_logo
     print_actions(actions, title: 'Menu')
   end
 
-  def new_player
+  def show_user_actions(actions)
+    print_actions(actions, title: 'Actions')
+  end
+
+  def making_bets_message
+    flash('Making bets!')
+  end
+
+  def draw_message
+    flash('DRAW!')
+  end
+
+  def win_message(player, money)
+    flash("#{player.name.upcase} WON #{money}")
+  end
+
+  def took_card_message(player)
+    flash("#{player.name} took a card!")
+  end
+
+  def enter_name_message
     puts "\tInput your name:"
   end
 
-  def game_table_ui(players, bank, dealer_info_hidden: false)
-    print_player_ui(players.last, info_hidden: dealer_info_hidden)
+  def show_game_table(players, bank, dealer_hidden: false)
+    print_player_ui(players.last, info_hidden: dealer_hidden)
     puts "\t" * 3 + "Bank: #{bank}"
     print_player_ui(players.first)
   end
@@ -38,14 +52,6 @@ class Interface
     print_cards_value(player) unless info_hidden
   end
 
-  def print_actions(actions_hash, title: nil)
-    puts "\t" + title if title
-    actions_hash.each do |num, action_info|
-      text = "\t#{num}: #{action_info[:text]} \n"
-      print text
-    end
-  end
-
   def receive_action
     gets.to_i
   end
@@ -55,6 +61,20 @@ class Interface
   end
 
   private
+
+  def print_actions(actions_hash, title: nil)
+    puts "\t" + title if title
+    actions_hash.each do |num, action_info|
+      text = "\t#{num}: #{action_info[:text]} \n"
+      print text
+    end
+  end
+
+  def flash(message)
+    puts LINE_LG
+    puts "\t" * 3 + message
+    puts LINE_LG
+  end
 
   def print_cards(player, hidden: false)
     if hidden

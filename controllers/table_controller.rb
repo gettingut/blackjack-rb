@@ -1,12 +1,13 @@
 # frozen_string_literal: true
 
 class TableController
+  include InputValidator
   include Referee
 
   INGAME_ACTIONS = {
     1 => { text: 'Check', method: :user_checks },
-    2 => { text: 'Take card', method: :user_take_card },
-    3 => { text: 'Show your cards', method: :user_show_cards }
+    2 => { text: 'Take card', method: :user_takes_card },
+    3 => { text: 'Show your cards', method: :show_cards }
   }.freeze
   ENDGAME_ACTIONS = {
     1 => { text: 'Play again', method: :play_again },
@@ -24,24 +25,26 @@ class TableController
 
   def start_new_game!
     give_out_cards
-    interface.game_table_ui(players, bank, dealer_info_hidden: true)
+    interface.show_game_table(players, bank, dealer_hidden: true)
     make_bets
-    table_interface
+    interface.show_game_table(players, bank, dealer_hidden: true)
+    user_actions_interface(INGAME_ACTIONS)
   end
 
   private
 
-  def table_interface(dealer_info_hidden: true)
-    interface.game_table_ui(
-      players,
-      bank,
-      dealer_info_hidden: dealer_info_hidden
-    )
-    actions_interface(INGAME_ACTIONS, 'Actions')
+  def give_out_cards
+    players.each { |player| give_cards(player, 2, message: false) }
+  end
+
+  def give_cards(player, amount, message: true)
+    cards = @deck.pick_cards(amount)
+    player.cards += cards
+    interface.took_card_message(player) if message
   end
 
   def make_bets
-    interface.flash('Making bets!')
+    interface.making_bets_message
     players.each { |player| take_bet(player, 10) }
     sleep(1)
   end
@@ -51,59 +54,61 @@ class TableController
     @bank += money
   end
 
-  def give_out_cards
-    players.each { |player| give_cards(player, 2) }
-  end
-
-  def give_cards(player, amount)
-    cards = @deck.pick_cards(amount)
-    player.cards += cards
-    interface.flash("#{player.name} took a card!")
+  def user_actions_interface(actions)
+    interface.show_user_actions(actions)
+    user_action = interface.receive_action
+    check_input(actions, user_action)
+    input_to_method(actions, user_action)
+  rescue RuntimeError => e
+    puts e.message
+    retry
   end
 
   def user_checks
     dealer_turn
-    table_interface
+    if dealer.cards.size > 2
+      show_cards
+    else
+      interface.show_game_table(players, bank, dealer_hidden: true)
+      user_actions_interface(ENDGAME_ACTIONS)
+    end
   end
 
-  def user_take_card
+  def user_takes_card
     give_cards(user, 1)
     dealer_turn
-    user_show_cards
+    show_cards
   end
 
   def dealer_turn
     give_cards(dealer, 1) if dealer.take_card?
   end
 
-  def user_show_cards
-    interface.game_table_ui(players, bank, dealer_info_hidden: false)
+  def show_cards
+    interface.show_game_table(players, bank)
+    compare_players_results
+    user_actions_interface(ENDGAME_ACTIONS)
+  end
+
+  def compare_players_results
     if draw?(players)
       handle_draw
     else
       winner = find_winner(players)
       handle_win(winner)
     end
-    actions_interface(ENDGAME_ACTIONS, 'Actions')
-  end
-
-  def actions_interface(actions, title)
-    interface.print_actions(actions, title: title)
-    input = interface.receive_action
-    input_to_method(actions, input)
   end
 
   def handle_draw
+    interface.draw_message
     prize = bank / 2
-    interface.flash('DRAW!')
     user.money += prize
     dealer.money += prize
     @bank = 0
   end
 
   def handle_win(player)
-    message = "#{player.name.upcase} WON #{bank}"
-    interface.flash(message)
+    interface.win_message(player, bank)
     player.money += bank
     @bank = 0
   end
@@ -111,11 +116,11 @@ class TableController
   def play_again
     players.each { |player| player.cards = [] }
     @deck = new_deck
-    start_new_game!
   end
 
   def input_to_method(actions, input)
-    send(actions[input][:method])
+    method = actions[input][:method]
+    send(method)
   end
 
   def new_deck
